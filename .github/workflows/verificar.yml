@@ -1,0 +1,38 @@
+name: Verificar Java e MySQL
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  integracao:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root_ci_apenas
+          MYSQL_DATABASE: escola_maximus
+          MYSQL_USER: aluno_java
+          MYSQL_PASSWORD: MaximusLocal_2026!
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot_ci_apenas"
+          --health-interval=10s --health-timeout=5s --health-retries=15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Preparar banco e configuracao de laboratorio
+        env:
+          MYSQL_PWD: MaximusLocal_2026!
+        run: |
+          mysql --protocol=TCP -h127.0.0.1 -ualuno_java escola_maximus < sql/01_banco.sql
+          cp db.properties.example db.properties
+      - name: Compilar
+        run: mvn --batch-mode test-compile
+      - name: Testar conexao real
+        run: mvn --batch-mode exec:java -Dexec.mainClass=br.com.maximus.TestarConexao
+      - name: Testar CRUD real
+        run: mvn --batch-mode exec:java -Dexec.mainClass=br.com.maximus.VerificarCRUD -Dexec.classpathScope=test

@@ -1,0 +1,5 @@
+# Copie para db.properties na raiz do projeto.
+# Apenas para MySQL instalado no proprio computador.
+db.url=jdbc:mysql://localhost:3306/escola_maximus?sslMode=REQUIRED&connectTimeout=5000&socketTimeout=10000
+db.usuario=aluno_java
+db.senha=MaximusLocal_2026!
