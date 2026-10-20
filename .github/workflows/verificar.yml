@@ -24,15 +24,13 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - name: Preparar banco e configuracao de laboratorio
+      - name: Preparar banco vazio
         env:
-          MYSQL_PWD: MaximusLocal_2026!
-        run: |
-          mysql --protocol=TCP -h127.0.0.1 -ualuno_java escola_maximus < sql/01_banco.sql
-          cp db.properties.example db.properties
-      - name: Compilar
-        run: mvn --batch-mode test-compile
-      - name: Testar conexao real
-        run: mvn --batch-mode exec:java -Dexec.mainClass=br.com.maximus.TestarConexao
-      - name: Testar CRUD real
-        run: mvn --batch-mode exec:java -Dexec.mainClass=br.com.maximus.VerificarCRUD -Dexec.classpathScope=test
+          MYSQL_PWD: root_ci_apenas
+        run: mysql --protocol=TCP -h127.0.0.1 -uroot < sql/01_banco.sql
+      - name: Compilar todos os exemplos
+        run: mvn --batch-mode clean compile dependency:copy-dependencies
+      - name: Executar e conferir as dez respostas
+        env:
+          MYSQL_PWD: root_ci_apenas
+        run: python3 tests/verificar.py

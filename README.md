@@ -1,50 +1,32 @@
-# Java + MySQL no Eclipse | Escola Máximu’s
+# Java + MySQL: versão simples | Escola Máximu’s
 
-Tutorial para começar do zero e criar um cadastro de alunos no console, com código Java simples, JDBC e MySQL. Material organizado pelo Prof. Bruno Michel Pera.
+Uma classe de conexão e dez programas independentes. Abra um arquivo, execute e observe o resultado. Material do Prof. Bruno Michel Pera.
 
-[![Verificação Java e MySQL](https://github.com/perabru/java-mysql/actions/workflows/verificar.yml/badge.svg)](https://github.com/perabru/java-mysql/actions/workflows/verificar.yml)
+[Baixar PDF](docs/Java_MySQL_Eclipse_Maximus.pdf) · [Baixar códigos em ZIP](https://github.com/perabru/java-mysql/archive/refs/heads/main.zip) · [Respostas dos 10 exercícios](#respostas-dos-10-exercícios)
 
-**[Baixar o PDF ilustrado](docs/Java_MySQL_Eclipse_Maximus.pdf)** · **[Baixar todos os códigos em ZIP](https://github.com/perabru/java-mysql/archive/refs/heads/main.zip)** · **[Ver os 10 exercícios](#10-exercícios-para-praticar)**
+[![Testes](https://github.com/perabru/java-mysql/actions/workflows/verificar.yml/badge.svg)](https://github.com/perabru/java-mysql/actions/workflows/verificar.yml)
 
-## O que está pronto
+## 1. Baixe e instale
 
-- Conexão com fechamento automático e configuração em arquivo local.
-- Cadastro, listagem, alteração e exclusão com confirmação.
-- `PreparedStatement`, e-mail único, validação básica e tratamento de erros.
-- Scripts SQL que preservam os registros existentes.
-- Teste de integração com 12 verificações no MySQL real e GitHub Actions.
-
-## 1. Downloads oficiais
-
-| Ferramenta | Download | Escolha / função |
+| Programa | Link oficial | Para que serve |
 |---|---|---|
-| JDK | https://adoptium.net/temurin/releases/?version=21 | JDK 21 LTS para seu sistema; o código exige Java 17 ou superior |
-| Eclipse | https://www.eclipse.org/downloads/packages/ | Eclipse IDE for Java Developers; mantenha o runtime exigido pelo instalador |
-| MySQL Server | https://dev.mysql.com/downloads/mysql/8.4.html | MySQL Community Server 8.4 LTS |
-| MySQL Workbench | https://dev.mysql.com/downloads/workbench/ | Editor SQL opcional; não substitui o servidor |
-| Connector/J | https://dev.mysql.com/downloads/connector/j/ | Driver JDBC; download manual apenas no caminho sem Maven |
-| Connector/J 9.7.0 | https://downloads.mysql.com/archives/c-j/ | Versão fixada no projeto; escolha 9.7.0 e Platform Independent |
-| Maven | https://maven.apache.org/download.cgi | Opcional no terminal; o Eclipse já inclui integração Maven |
+| JDK 21 LTS | https://adoptium.net/temurin/releases/?version=21 | Compilar e executar Java; o projeto aceita Java 17+ |
+| Eclipse IDE for Java Developers | https://www.eclipse.org/downloads/packages/ | Escrever e executar os exemplos |
+| MySQL Server 8.4 LTS | https://dev.mysql.com/downloads/mysql/8.4.html | Guardar os dados |
+| MySQL Workbench | https://dev.mysql.com/downloads/workbench/ | Executar SQL e visualizar o banco |
+| Connector/J | https://dev.mysql.com/downloads/connector/j/ | Driver de conexão; Maven baixa automaticamente |
+| Connector/J 9.7.0 (arquivo) | https://downloads.mysql.com/archives/c-j/ | Para o caminho manual: 9.7.0, Platform Independent, ZIP |
 
-As páginas de download mudam. Este projeto fixa Connector/J **9.7.0** para permitir reproduzir a aula; não significa que seja a versão mais recente. Nunca baixe o driver de sites desconhecidos.
+Instale o JDK. No terminal, confira `java -version` e `javac -version`. Instale o Eclipse e mantenha o runtime exigido pelo instalador da IDE. Instale e configure o MySQL Server na porta **3306**, guarde a senha de `root` e mantenha a autenticação e TLS padrão. O Workbench sozinho não instala nem liga o servidor.
 
-## 2. Instalar e verificar (Windows)
+## 2. Prepare o banco
 
-1. Instale o **JDK**, marque a opção de adicionar ao PATH e, se oferecido, JAVA_HOME. Abra um novo terminal e execute `java -version` e `javac -version`. Ambos devem indicar Java 17 ou superior.
-2. Instale o Eclipse IDE for Java Developers e escolha uma pasta de workspace. Se a versão atual do Eclipse exigir outro Java para a própria IDE, utilize o runtime fornecido pelo instalador; o projeto pode continuar no JDK 21.
-3. Instale o **MySQL Server**, conclua o MySQL Configurator, mantenha a porta **3306**, guarde a senha de `root` e configure o serviço para iniciar com o Windows. Deixe a autenticação padrão e TLS habilitado.
-4. Opcionalmente instale o Workbench. Crie/abra a conexão local: hostname `localhost`, porta `3306`, usuário `root`, senha definida na instalação. Use **Test Connection**.
-5. No Windows, `Win + R` → `services.msc` permite conferir se o serviço MySQL está em execução. O nome pode variar, como `MySQL84`.
+No Workbench, conecte como `root`, host `localhost`, porta `3306`. Use **File → Open SQL Script** e execute o script inteiro com o raio:
 
-**Servidor x ferramentas:** o servidor guarda os dados; Workbench edita SQL; Eclipse executa Java; Connector/J permite ao Java conversar com o servidor.
+1. `sql/01_banco.sql`: cria `escola_maximus` e a tabela `alunos`.
+2. `sql/02_usuario_local.sql`: cria o usuário da aula e suas permissões.
 
-## 3. Criar o banco e o usuário
-
-1. Baixe o ZIP deste repositório pelo botão acima e extraia em uma pasta permanente.
-2. Abra o Workbench como `root`. Em **File → Open SQL Script**, abra `sql/01_banco.sql` e execute o script inteiro com o raio de execução. Ele cria `escola_maximus` e a tabela `alunos`.
-3. Abra `sql/02_usuario_local.sql` e execute. Ele cria `aluno_java`, com permissão somente para consultar e modificar dados nesse banco.
-4. Clique com o botão direito em **Schemas → Refresh All**. Abra `escola_maximus → Tables → alunos`.
-5. Verifique com:
+Os scripts não apagam registros existentes. Confira:
 
 ```sql
 USE escola_maximus;
@@ -52,153 +34,579 @@ SHOW TABLES;
 SELECT * FROM alunos;
 ```
 
-Uma tabela vazia nesta etapa é normal. Campos: `id` automático, `nome` obrigatório (100 caracteres), `email` obrigatório e único (150 caracteres).
+Para o exercício 8, execute **uma vez**, como administrador, `sql/03_turma.sql`. Se disser `Duplicate column name`, a coluna já existe: não precisa executar de novo. Para o exercício 10, execute `sql/04_produtos.sql`.
 
-A senha `MaximusLocal_2026!` é **didática e pública**, somente para laboratório local. Não reutilize em servidores reais. Se o usuário já existir, o script preserva a senha anterior. Para redefini-la conscientemente como administrador:
+## 3. Abra no Eclipse
+
+1. Baixe o ZIP acima e extraia.
+2. **File → Import → Maven → Existing Maven Projects**.
+3. Selecione a pasta que contém `pom.xml` e clique em **Finish**.
+4. Aguarde as dependências. Se necessário: botão direito no projeto → **Maven → Update Project**.
+5. Abra `src/main/java → (default package) → Conexao.java`.
+6. Confira as três variáveis: URL, usuário e senha.
+7. Abra `Exercicio01.java` → botão direito → **Run As → Java Application**.
+
+Não crie `module-info.java`. Os arquivos ficam no pacote padrão para reduzir os passos iniciais. O projeto não usa DAO, arquivo de propriedades, framework ou camadas adicionais.
+
+### Conexão completa
+
+```java
+import java.sql.*;
+
+public class Conexao {
+    public static Connection conectar() throws SQLException {
+        String url = "jdbc:mysql://localhost:3306/escola_maximus"
+            + "?sslMode=REQUIRED";
+        String usuario = "aluno_java";
+        String senha = "MaximusLocal_2026!"; // Senha publica da aula.
+        return DriverManager.getConnection(url, usuario, senha);
+    }
+}
+```
+
+A senha acima é pública e didática, para o MySQL instalado no próprio computador. Para a aula, ela é a mesma do script 02. Se o usuário já existia, o script preserva a senha antiga; ajuste `senha` para o valor correto. Não coloque senhas reais no GitHub.
+
+A URL exige TLS. Para outro computador/servidor use uma configuração adequada com `sslMode=VERIFY_IDENTITY` e certificado confiável; `REQUIRED` criptografa, mas não verifica a identidade do servidor.
+
+### Entenda os cinco comandos principais
+
+| Código | O que faz |
+|---|---|
+| `Conexao.conectar()` | Abre a conexão |
+| `prepareStatement(sql)` | Prepara o SQL |
+| `setString(1, valor)` | Preenche o primeiro `?` com texto |
+| `executeUpdate()` | Executa INSERT, UPDATE ou DELETE |
+| `executeQuery()` | Executa SELECT e retorna um ResultSet |
+
+`try (...)` fecha os recursos automaticamente. `rs.next()` vai para a próxima linha. `throws SQLException` deixa o Java mostrar erros do banco; os primeiros exemplos priorizam a leitura do SQL. O tratamento com mensagens e repetição está no exercício 9. A validação de e-mail é propositalmente básica: presença de `@`, sem espaços e limite de tamanho quando indicado; não verifica domínio ou existência da caixa postal.
+
+## 4. Se a aula pedir um Java Project sem Maven
+
+1. **File → New → Java Project**. Use JDK 17+ e não crie `module-info.java`.
+2. Copie `Conexao.java` e os exercícios de `src/main/java` para a pasta `src`, sem criar pacote.
+3. Baixe e extraia o ZIP oficial do Connector/J 9.7.0. Copie o `.jar` para uma pasta `lib` do projeto.
+4. Botão direito no projeto → **Build Path → Configure Build Path → Libraries → Classpath → Add JARs** → selecione o JAR → **Apply and Close**.
+5. Execute `Exercicio01` como Java Application. Não misture as duas formas no mesmo projeto.
+
+## 5. Ordem de execução
+
+Primeiro 01, depois 02 para criar os três alunos. Rode 04 com busca vazia para visualizar os nomes e IDs antes de alterar ou excluir. Digite **um número por linha** nos campos ID. Nos exemplos curtos, texto no lugar de um número gera `NumberFormatException`; o exercício 9 ensina a tratar isso.
+
+Cada execução de 08 e 10 faz uma operação. Execute novamente a classe para escolher outra. Só o exercício 9 mantém o menu aberto. Todos compartilham `Conexao.java`.
+
+## Respostas dos 10 exercícios
+
+As respostas abaixo são completas e idênticas aos arquivos `.java` do projeto. Cada bloco deve ser salvo no arquivo indicado. Não cole todas as classes no mesmo arquivo.
+
+### 01. Primeira conexão
+
+**Enunciado:** Instale o ambiente e conecte ao banco.
+
+**Resposta:** Conectado: escola_maximus. Host é o computador do banco; porta é o ponto de acesso (3306); escola_maximus é o nome do banco.
+
+Arquivo: [src/main/java/Exercicio01.java](src/main/java/Exercicio01.java)
+
+```java
+import java.sql.*;
+
+public class Exercicio01 {
+    public static void main(String[] args) throws SQLException {
+        try (Connection c = Conexao.conectar()) {
+            System.out.println("Conectado: " + c.getCatalog());
+        }
+    }
+}
+```
+
+### 02. Três cadastros
+
+**Enunciado:** Cadastre três alunos e confira os registros no Java e no Workbench.
+
+**Resposta:** Execute 02 e depois 04 com uma linha vazia para listar todos. No Workbench, SELECT * FROM alunos mostra IDs distintos. Repetir 02 informa os e-mails já cadastrados sem duplicar registros.
+
+Arquivo: [src/main/java/Exercicio02.java](src/main/java/Exercicio02.java)
+
+```java
+import java.sql.*;
+
+public class Exercicio02 {
+    public static void main(String[] args) throws SQLException {
+        String[] nomes = {"Ana", "Bruno", "Carla"};
+        String[] emails = {"ana@example.com", "bruno@example.com",
+                           "carla@example.com"};
+        String sql = "INSERT INTO alunos (nome, email) VALUES (?, ?)";
+        try (Connection c = Conexao.conectar();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            for (int i = 0; i < nomes.length; i++) {
+                ps.setString(1, nomes[i]);
+                ps.setString(2, emails[i]);
+                try {
+                    ps.executeUpdate();
+                    System.out.println("Cadastrado: " + nomes[i]);
+                } catch (SQLException e) {
+                    if (e.getErrorCode() != 1062) throw e;
+                    System.out.println("E-mail ja cadastrado: " + emails[i]);
+                }
+            }
+        }
+    }
+}
+```
+
+### 03. Buscar por ID
+
+**Enunciado:** Mostre nome/e-mail de um aluno ou informe que o ID não existe.
+
+**Resposta:** Digite o ID obtido no exercício 2. Depois teste 999999 para conferir a mensagem de aluno não encontrado.
+
+Arquivo: [src/main/java/Exercicio03.java](src/main/java/Exercicio03.java)
+
+```java
+import java.sql.*;
+import java.util.Scanner;
+
+public class Exercicio03 {
+    public static void main(String[] args) throws SQLException {
+        try (Scanner teclado = new Scanner(System.in)) {
+            System.out.print("ID do aluno: ");
+            int id = Integer.parseInt(teclado.nextLine());
+            String sql = "SELECT nome, email FROM alunos WHERE id = ?";
+            try (Connection c = Conexao.conectar();
+                 PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, id);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        System.out.println(rs.getString("nome"));
+                        System.out.println(rs.getString("email"));
+                    } else {
+                        System.out.println("Aluno nao encontrado.");
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+### 04. Pesquisar por nome
+
+**Enunciado:** Busque parte do nome com LIKE e ordene por nome.
+
+**Resposta:** Digite a para vários nomes, zzz para nenhum e deixe vazio para listar todos. O termo é passado ao parâmetro, não concatenado ao SQL. % e _ mantêm o significado de curingas de LIKE.
+
+Arquivo: [src/main/java/Exercicio04.java](src/main/java/Exercicio04.java)
+
+```java
+import java.sql.*;
+import java.util.Scanner;
+
+public class Exercicio04 {
+    public static void main(String[] args) throws SQLException {
+        try (Scanner teclado = new Scanner(System.in)) {
+            System.out.print("Parte do nome: ");
+            String nome = teclado.nextLine();
+            String sql = "SELECT id, nome FROM alunos "
+                + "WHERE nome LIKE ? ORDER BY nome";
+            try (Connection c = Conexao.conectar();
+                 PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, "%" + nome + "%");
+                try (ResultSet rs = ps.executeQuery()) {
+                    boolean encontrou = false;
+                    while (rs.next()) {
+                        encontrou = true;
+                        System.out.println(rs.getInt("id") + " - "
+                            + rs.getString("nome"));
+                    }
+                    if (!encontrou) System.out.println("Nenhum aluno.");
+                }
+            }
+        }
+    }
+}
+```
+
+### 05. Atualizar e-mail
+
+**Enunciado:** Altere somente o e-mail, preserve o nome e trate e-mail inválido e repetido.
+
+**Resposta:** Digite um ID existente e outro e-mail fictício. Teste sem @ e com um e-mail já cadastrado. O UPDATE altera apenas a coluna email.
+
+Arquivo: [src/main/java/Exercicio05.java](src/main/java/Exercicio05.java)
+
+```java
+import java.sql.*;
+import java.util.Scanner;
+
+public class Exercicio05 {
+    public static void main(String[] args) throws SQLException {
+        try (Scanner teclado = new Scanner(System.in)) {
+            System.out.print("ID: ");
+            int id = Integer.parseInt(teclado.nextLine());
+            System.out.print("Novo e-mail: ");
+            String email = teclado.nextLine().trim();
+            if (!email.contains("@") || email.contains(" ")
+                    || email.length() > 150) {
+                System.out.println("E-mail invalido.");
+                return;
+            }
+            String sql = "UPDATE alunos SET email = ? WHERE id = ?";
+            try (Connection c = Conexao.conectar();
+                 PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, email);
+                ps.setInt(2, id);
+                int linhas = ps.executeUpdate();
+                System.out.println(linhas > 0 ? "Atualizado!" : "ID inexistente.");
+            } catch (SQLException e) {
+                if (e.getErrorCode() != 1062) throw e;
+                System.out.println("E-mail ja cadastrado.");
+            }
+        }
+    }
+}
+```
+
+### 06. Exclusão segura
+
+**Enunciado:** Mostre os dados, peça S/N e trate o ID ausente.
+
+**Resposta:** Com N, o registro permanece. Com S, ele é excluído. Com 999999, aparece a mensagem de aluno não encontrado.
+
+Arquivo: [src/main/java/Exercicio06.java](src/main/java/Exercicio06.java)
+
+```java
+import java.sql.*;
+import java.util.Scanner;
+
+public class Exercicio06 {
+    public static void main(String[] args) throws SQLException {
+        try (Scanner teclado = new Scanner(System.in);
+             Connection c = Conexao.conectar();
+             PreparedStatement buscar = c.prepareStatement(
+                 "SELECT nome, email FROM alunos WHERE id = ?");
+             PreparedStatement excluir = c.prepareStatement(
+                 "DELETE FROM alunos WHERE id = ?")) {
+            System.out.print("ID: ");
+            int id = Integer.parseInt(teclado.nextLine());
+            buscar.setInt(1, id);
+            try (ResultSet rs = buscar.executeQuery()) {
+                if (!rs.next()) {
+                    System.out.println("Aluno nao encontrado.");
+                    return;
+                }
+                System.out.println(rs.getString("nome") + " - "
+                    + rs.getString("email"));
+            }
+            System.out.print("Excluir? S/N: ");
+            if (!teclado.nextLine().equalsIgnoreCase("S")) {
+                System.out.println("Cancelado.");
+                return;
+            }
+            excluir.setInt(1, id);
+            System.out.println("Excluidos: " + excluir.executeUpdate());
+        }
+    }
+}
+```
+
+### 07. Contar alunos
+
+**Enunciado:** Use COUNT(*) e compare antes/depois de um cadastro e em banco de testes vazio.
+
+**Resposta:** No banco novo, o total começa em zero. Depois de executar 02 pela primeira vez, deve ser três. Se você já alterou a base, o resultado corresponde aos registros atuais.
+
+Arquivo: [src/main/java/Exercicio07.java](src/main/java/Exercicio07.java)
+
+```java
+import java.sql.*;
+
+public class Exercicio07 {
+    public static void main(String[] args) throws SQLException {
+        try (Connection c = Conexao.conectar();
+             PreparedStatement ps = c.prepareStatement(
+                 "SELECT COUNT(*) AS total FROM alunos");
+             ResultSet rs = ps.executeQuery()) {
+            rs.next();
+            System.out.println("Total: " + rs.getInt("total"));
+        }
+    }
+}
+```
+
+### 08. Adicionar turma
+
+**Enunciado:** Adicione turma VARCHAR(20) sem perder alunos e adapte cadastrar/listar/alterar.
+
+**Resposta:** Execute o SQL abaixo uma vez como root. O programa tem as opções 1 cadastrar, 2 listar e 3 alterar. Até 20 caracteres são aceitos. Nos alunos antigos, turma fica NULL até ser preenchida.
 
 ```sql
-ALTER USER 'aluno_java'@'localhost' IDENTIFIED BY 'SUA_NOVA_SENHA';
+-- Execute como administrador, uma vez, antes do exercicio 8.
+-- Preserva os alunos existentes: turma fica NULL nos registros antigos.
+USE escola_maximus;
+ALTER TABLE alunos ADD COLUMN turma VARCHAR(20);
 ```
 
-Depois ajuste a mesma senha no `db.properties`.
+Arquivo: [src/main/java/Exercicio08.java](src/main/java/Exercicio08.java)
 
-## 4. Abrir no Eclipse (caminho recomendado: Maven)
+```java
+import java.sql.*;
+import java.util.Scanner;
 
-1. **File → Import → Maven → Existing Maven Projects → Next**.
-2. Em **Root Directory**, selecione a pasta extraída que contém o `pom.xml`.
-3. Marque o projeto e clique em **Finish**. Aguarde o download das dependências; esta etapa precisa de internet.
-4. Em **Window → Preferences → Java → Installed JREs**, adicione/selecione seu JDK. Em **Project → Properties → Java Compiler**, use Java 17 ou superior; o POM compila para Java 17.
-5. Se aparecer erro de dependência: botão direito no projeto → **Maven → Update Project → Force Update → OK**. Confira a internet e o proxy da instituição.
-6. Na raiz do projeto, copie `db.properties.example` e renomeie a cópia para **db.properties**, sem `.txt` no final. Ajuste usuário/senha se você mudou o SQL.
-7. O arquivo deve ficar ao lado do `pom.xml`, e não dentro de `src`. Ele é ignorado pelo Git para não publicar sua senha.
-
-```properties
-db.url=jdbc:mysql://localhost:3306/escola_maximus?sslMode=REQUIRED&connectTimeout=5000&socketTimeout=10000
-db.usuario=aluno_java
-db.senha=MaximusLocal_2026!
+public class Exercicio08 {
+    public static void main(String[] args) throws SQLException {
+        try (Scanner teclado = new Scanner(System.in);
+             Connection c = Conexao.conectar()) {
+            System.out.println("1 Cadastrar | 2 Listar | 3 Alterar");
+            String opcao = teclado.nextLine();
+            if (opcao.equals("2")) {
+                try (PreparedStatement ps = c.prepareStatement(
+                        "SELECT id, nome, email, turma FROM alunos ORDER BY id");
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        System.out.println(rs.getInt("id") + " | "
+                            + rs.getString("nome") + " | "
+                            + rs.getString("email") + " | "
+                            + rs.getString("turma"));
+                    }
+                }
+                return;
+            }
+            if (!opcao.equals("1") && !opcao.equals("3")) {
+                System.out.println("Opcao invalida.");
+                return;
+            }
+            int id = 0;
+            if (opcao.equals("3")) {
+                System.out.print("ID: ");
+                id = Integer.parseInt(teclado.nextLine());
+            }
+            System.out.print("Nome: ");
+            String nome = teclado.nextLine().trim();
+            System.out.print("E-mail: ");
+            String email = teclado.nextLine().trim();
+            System.out.print("Turma: ");
+            String turma = teclado.nextLine().trim();
+            if (nome.isEmpty() || nome.length() > 100
+                    || !email.contains("@") || email.length() > 150
+                    || turma.isEmpty() || turma.length() > 20) {
+                System.out.println("Dados invalidos. Turma: ate 20 caracteres.");
+                return;
+            }
+            String sql = opcao.equals("1")
+                ? "INSERT INTO alunos (nome, email, turma) VALUES (?, ?, ?)"
+                : "UPDATE alunos SET nome = ?, email = ?, turma = ? WHERE id = ?";
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, nome);
+                ps.setString(2, email);
+                ps.setString(3, turma);
+                if (opcao.equals("3")) ps.setInt(4, id);
+                System.out.println("Registros gravados: " + ps.executeUpdate());
+            }
+        }
+    }
+}
 ```
 
-`sslMode=REQUIRED` exige conexão criptografada. No laboratório local funciona com o TLS padrão do MySQL. Em servidor remoto use `sslMode=VERIFY_IDENTITY`, hostname correto e certificado/CA confiável; REQUIRED não valida a identidade do servidor. Não desative TLS para contornar erros.
+### 09. Validações e erros
 
-## 5. Testar a conexão
+**Enunciado:** Rejeite nome com um caractere, e-mail vazio e ID negativo; teste cinco erros mantendo o menu aberto.
 
-1. Abra `src/main/java → br.com.maximus → TestarConexao.java`.
-2. Botão direito → **Run As → Java Application**.
-3. No Console deve aparecer:
+**Resposta:** O menu usa while e continue. A tabela após o código mostra cinco casos de teste. A entrada correta pode ser cadastrada logo depois de um erro.
 
-```text
-Conectado ao banco: escola_maximus
+Arquivo: [src/main/java/Exercicio09.java](src/main/java/Exercicio09.java)
+
+```java
+import java.sql.*;
+import java.util.Scanner;
+
+public class Exercicio09 {
+    public static void main(String[] args) {
+        try (Scanner teclado = new Scanner(System.in)) {
+            while (true) {
+                System.out.println("1 Cadastrar | 2 Excluir | 0 Sair");
+                if (!teclado.hasNextLine()) break;
+                String opcao = teclado.nextLine();
+                if (opcao.equals("0")) break;
+                try (Connection c = Conexao.conectar()) {
+                    if (opcao.equals("1")) {
+                        System.out.print("Nome: ");
+                        String nome = teclado.nextLine().trim();
+                        System.out.print("E-mail: ");
+                        String email = teclado.nextLine().trim();
+                        if (nome.length() < 2 || nome.length() > 100
+                                || !email.contains("@") || email.contains(" ")
+                                || email.length() > 150) {
+                            System.out.println("Nome ou e-mail invalido.");
+                            continue;
+                        }
+                        try (PreparedStatement ps = c.prepareStatement(
+                                "INSERT INTO alunos (nome, email) VALUES (?, ?)")) {
+                            ps.setString(1, nome);
+                            ps.setString(2, email);
+                            ps.executeUpdate();
+                            System.out.println("Cadastrado!");
+                        }
+                    } else if (opcao.equals("2")) {
+                        System.out.print("ID: ");
+                        int id = Integer.parseInt(teclado.nextLine());
+                        if (id <= 0) {
+                            System.out.println("ID deve ser positivo.");
+                            continue;
+                        }
+                        System.out.print("Excluir? S/N: ");
+                        if (!teclado.nextLine().equalsIgnoreCase("S")) continue;
+                        try (PreparedStatement ps = c.prepareStatement(
+                                "DELETE FROM alunos WHERE id = ?")) {
+                            ps.setInt(1, id);
+                            System.out.println("Excluidos: " + ps.executeUpdate());
+                        }
+                    } else {
+                        System.out.println("Opcao invalida.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Digite um numero inteiro.");
+                } catch (SQLException e) {
+                    System.out.println("Erro no banco: " + e.getMessage());
+                }
+            }
+        }
+    }
+}
 ```
 
-Se faltar o arquivo de configuração, abra **Run → Run Configurations → Java Application → TestarConexao → Arguments → Working directory** e selecione a raiz deste projeto. Em **Common → Encoding**, use UTF-8 se necessário.
+| Teste | O que digitar | Resultado |
+|---|---|---|
+| Nome curto | 1 → A → a@example.com | Nome ou e-mail inválido; volta ao menu |
+| E-mail vazio | 1 → Ana → linha vazia | Nome ou e-mail inválido; volta ao menu |
+| ID negativo | 2 → -1 | ID deve ser positivo; volta ao menu |
+| ID com texto | 2 → abc | Digite um número inteiro; volta ao menu |
+| E-mail duplicado | 1 → Outro Nome → e-mail já existente | Erro no banco pela chave única; volta ao menu |
 
-A classe `Conexao` lê os três valores do arquivo e usa `DriverManager.getConnection`. O driver é descoberto automaticamente; não é necessário `Class.forName`. `try (...)` fecha a conexão até quando ocorre erro.
+### 10. Mini-sistema de produtos
 
-## 6. Executar o cadastro
+**Enunciado:** Faça CRUD de produtos com BigDecimal, preço e estoque não negativos e confirmação de exclusão.
 
-Abra `CadastroAlunos.java` → **Run As → Java Application**. Clique no Console para digitar.
+**Resposta:** Execute o SQL abaixo como root. Rode a classe para cadastrar, listar, alterar ou excluir. Teste preço negativo, estoque negativo e ID 999999 nas opções de alterar/excluir.
 
-```text
-MAXIMUS | CADASTRO DE ALUNOS
-1 Cadastrar | 2 Listar | 3 Alterar
-4 Excluir   | 0 Sair
+```sql
+-- Execute como administrador antes do exercicio 10.
+USE escola_maximus;
+CREATE TABLE IF NOT EXISTS produtos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nome VARCHAR(100) NOT NULL,
+  preco DECIMAL(10,2) NOT NULL CHECK (preco >= 0),
+  estoque INT NOT NULL CHECK (estoque >= 0)
+);
 ```
 
-1. Digite `1`, depois um nome e um e-mail fictício; anote o ID retornado.
-2. Digite `2` e confira o aluno na lista.
-3. Digite `3`, o ID e novos dados; liste novamente.
-4. Digite `4`, o ID e `S` para confirmar; `N` cancela.
-5. Digite `0` para encerrar. Fechar o programa não apaga o banco.
-6. No Workbench, execute novamente `SELECT * FROM escola_maximus.alunos;` para conferir a persistência.
+Arquivo: [src/main/java/Exercicio10.java](src/main/java/Exercicio10.java)
 
-Use apenas dados fictícios nos exercícios. Repetir um e-mail mostra uma mensagem sem encerrar o menu. IDs inexistentes também recebem uma mensagem. A validação de e-mail é básica e não verifica se a caixa postal existe.
+```java
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.Scanner;
 
-## 7. Entender os arquivos
+public class Exercicio10 {
+    public static void main(String[] args) throws SQLException {
+        try (Scanner teclado = new Scanner(System.in);
+             Connection c = Conexao.conectar()) {
+            System.out.println("1 Cadastrar | 2 Listar | 3 Alterar | 4 Excluir");
+            String opcao = teclado.nextLine();
+            if (opcao.equals("2")) {
+                try (PreparedStatement ps = c.prepareStatement(
+                        "SELECT id, nome, preco, estoque FROM produtos ORDER BY id");
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        System.out.println(rs.getInt("id") + " | "
+                            + rs.getString("nome") + " | R$ "
+                            + rs.getBigDecimal("preco") + " | "
+                            + rs.getInt("estoque"));
+                    }
+                }
+                return;
+            }
+            if (!opcao.equals("1") && !opcao.equals("3") && !opcao.equals("4")) {
+                System.out.println("Opcao invalida.");
+                return;
+            }
+            int id = 0;
+            if (!opcao.equals("1")) {
+                System.out.print("ID: ");
+                id = Integer.parseInt(teclado.nextLine());
+                if (id <= 0) {
+                    System.out.println("ID invalido.");
+                    return;
+                }
+            }
+            if (opcao.equals("4")) {
+                System.out.print("Excluir? S/N: ");
+                if (!teclado.nextLine().equalsIgnoreCase("S")) return;
+                try (PreparedStatement ps = c.prepareStatement(
+                        "DELETE FROM produtos WHERE id = ?")) {
+                    ps.setInt(1, id);
+                    int linhas = ps.executeUpdate();
+                    System.out.println(linhas > 0 ? "Excluido!" : "ID inexistente.");
+                }
+                return;
+            }
+            System.out.print("Nome: ");
+            String nome = teclado.nextLine().trim();
+            System.out.print("Preco (ex.: 12.50): ");
+            BigDecimal preco = new BigDecimal(teclado.nextLine().replace(",", "."));
+            System.out.print("Estoque: ");
+            int estoque = Integer.parseInt(teclado.nextLine());
+            if (nome.isEmpty() || nome.length() > 100 || preco.signum() < 0
+                    || preco.compareTo(new BigDecimal("99999999.99")) > 0
+                    || preco.stripTrailingZeros().scale() > 2 || estoque < 0) {
+                System.out.println("Dados invalidos; preco: ate 2 casas decimais.");
+                return;
+            }
+            String sql = opcao.equals("1")
+                ? "INSERT INTO produtos (nome, preco, estoque) VALUES (?, ?, ?)"
+                : "UPDATE produtos SET nome = ?, preco = ?, estoque = ? WHERE id = ?";
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, nome);
+                ps.setBigDecimal(2, preco);
+                ps.setInt(3, estoque);
+                if (opcao.equals("3")) ps.setInt(4, id);
+                int linhas = ps.executeUpdate();
+                System.out.println(linhas > 0 ? "Gravado!" : "ID inexistente.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Numero invalido.");
+        }
+    }
+}
+```
 
-| Arquivo | Responsabilidade |
-|---|---|
-| `Conexao.java` | Ler configuração e abrir conexão |
-| `TestarConexao.java` | Primeiro teste, sem CRUD |
-| `AlunoDAO.java` | SQL de inserir, listar, alterar e excluir |
-| `CadastroAlunos.java` | Menu e leitura do teclado |
-| `sql/01_banco.sql` | Criar banco e tabela sem apagar dados |
-| `sql/02_usuario_local.sql` | Criar usuário restrito para laboratório |
-| `src/test/.../VerificarCRUD.java` | Verificação automatizada no MySQL real |
+## 6. Executar pelo terminal (opcional)
 
-**DAO** significa Data Access Object: uma classe que reúne o acesso aos dados. No cadastro, `?` representa um valor. `setString`/`setInt` preenchem esses valores sem concatenar a entrada do usuário ao SQL. Os índices começam em 1. `executeUpdate()` executa INSERT/UPDATE/DELETE; `executeQuery()` retorna as linhas de SELECT. `ResultSet.next()` avança uma linha.
-
-## 8. Alternativa sem Maven (JAR manual)
-
-Use este caminho **em vez** da importação Maven, se a aula pedir um Java Project tradicional.
-
-1. **File → New → Java Project**, nome `JavaMySQL`; use JDK 17 ou superior e não crie `module-info.java`.
-2. Crie o pacote `br.com.maximus` dentro de `src` e copie para ele as quatro classes de `src/main/java/br/com/maximus` deste repositório.
-3. Baixe o Connector/J 9.7.0 no arquivo oficial, opção **Platform Independent**, ZIP; extraia o arquivo `mysql-connector-j-9.7.0.jar`.
-4. Crie uma pasta `lib` na raiz do projeto e copie o JAR para ela.
-5. Botão direito no projeto → **Build Path → Configure Build Path → Libraries → Classpath → Add JARs**. Selecione o arquivo de `lib` → **Apply and Close**.
-6. Copie `db.properties.example` para a raiz deste novo projeto e renomeie para `db.properties`.
-7. Execute primeiro `TestarConexao`, depois `CadastroAlunos`. Não adicione o mesmo driver duas vezes.
-
-## 9. Terminal e verificação automatizada (opcional)
-
-Com JDK e Maven instalados, na raiz do projeto, depois dos scripts SQL e do `db.properties`:
+Com Maven instalado, na raiz:
 
 ```sh
-mvn clean compile
-mvn exec:java -Dexec.mainClass=br.com.maximus.TestarConexao
-mvn exec:java
+mvn compile
+mvn exec:java -Dexec.mainClass=Exercicio01
+mvn exec:java -Dexec.mainClass=Exercicio02
 ```
 
-Teste de integração, que cria dados temporários e remove o aluno criado no final:
+Troque o número para executar outra resposta. No PowerShell, se necessário, coloque `"-Dexec.mainClass=Exercicio01"` entre aspas.
 
-```sh
-mvn test-compile
-mvn exec:java -Dexec.mainClass=br.com.maximus.VerificarCRUD -Dexec.classpathScope=test
-```
+## 7. Erros comuns
 
-No PowerShell, coloque cada argumento `-D...` entre aspas se o shell alterar a interpretação. O resultado esperado é **APROVADO: 12 verificacoes.** Os testes cobrem CRUD, Unicode/apóstrofo, texto parecido com SQL, duplicidade, dados inválidos e IDs ausentes. `mvn test` sozinho não executa esse teste: rode o comando explícito acima. O GitHub Actions prepara um MySQL 8.4 e executa os mesmos comandos em cada push/PR.
-
-## 10. Resolver problemas
-
-| Mensagem / sintoma | O que conferir |
+| Erro | Confira |
 |---|---|
-| `No suitable driver` | Maven Dependencies ou JAR em Classpath; URL deve começar com `jdbc:mysql:` |
-| `Access denied` | Usuário, senha, host e execução de `02_usuario_local.sql`; usuário existente preserva a senha anterior |
-| `Unknown database` | Executar `01_banco.sql`; nome deve ser `escola_maximus` |
-| `Table ... doesn't exist` | Executar o script inteiro no banco correto |
-| `Communications link failure` | Serviço MySQL ativo, hostname e porta 3306; não liberar a porta na internet |
-| Erro de TLS | Habilitar TLS no servidor e usar Connector/J compatível; manter `sslMode=REQUIRED` local |
-| `Public Key Retrieval is not allowed` | Conferir a URL fornecida e o TLS do servidor; não adicionar parâmetros inseguros automaticamente |
-| `Copie db.properties...` | Arquivo na raiz, sem `.txt`, e Working directory correto |
-| E-mail já cadastrado | Escolher outro e-mail fictício ou alterar o cadastro existente |
-| Acentos incorretos | Projeto, arquivos e Console em UTF-8; tabela em utf8mb4 |
-| `UnsupportedClassVersionError` | Runtime Java antigo; escolher JDK 17+ na execução |
-| `module ... does not read java.sql` | Usar o exemplo sem `module-info.java` e driver no Classpath |
+| No suitable driver | Maven Dependencies ou JAR no Classpath |
+| Access denied | Usuário e senha da classe Conexao e script 02 |
+| Unknown database | Execute sql/01_banco.sql |
+| Coluna turma ausente | Execute sql/03_turma.sql uma vez como administrador |
+| Tabela produtos ausente | Execute sql/04_produtos.sql |
+| Communications link failure | Serviço MySQL ligado, host localhost e porta 3306 |
+| Erro TLS | Mantenha TLS habilitado no servidor e use a URL fornecida |
+| NumberFormatException | Digite um número no campo numérico; o exercício 9 mostra como tratar |
 
-## 10 exercícios para praticar
+## 8. Verificação automática
 
-Faça os exercícios em ordem, usando dados fictícios. Entregue o código, o SQL adicional quando houver e evidências de execução. Não há gabarito: o projeto base é o ponto de partida.
+O GitHub Actions compila todas as classes e testa as dez respostas contra MySQL 8.4. O arquivo `tests/verificar.py` verifica os dados reais no banco, as mensagens, as confirmações, as validações e a preservação dos alunos na migração de turma. Ele usa uma base descartável de testes: não execute esse verificador em um banco com dados reais.
 
-1. **Primeira conexão.** Instale as ferramentas, prepare banco/usuário e execute `TestarConexao`. Entregue uma captura do Console e explique host, porta e nome do banco sem mostrar sua senha.
-2. **Três cadastros.** Cadastre três alunos pelo menu e liste todos. Confirme os mesmos registros com SELECT no Workbench. Os IDs devem ser diferentes.
-3. **Buscar por ID.** Adicione a opção 5, que recebe um ID e mostra nome/e-mail. Use `WHERE id = ?`. Teste um ID existente e um inexistente.
-4. **Pesquisar por nome.** Adicione busca parcial com `LIKE ?` e `ORDER BY nome`. Teste um termo que retorne vários alunos e outro que não retorne nenhum; não concatene o termo ao SQL.
-5. **Atualizar e-mail.** Crie uma opção que altere apenas o e-mail de um aluno por ID. Preserve o nome. Teste sucesso, e-mail inválido e duplicado.
-6. **Exclusão segura.** Antes de excluir, mostre os dados do aluno e peça confirmação. Com `N`, os dados devem permanecer; com `S`, o aluno deve desaparecer; trate ID ausente.
-7. **Contar alunos.** Exiba o total usando `SELECT COUNT(*)`. Verifique o resultado antes e depois de cadastrar um aluno e no banco vazio de testes.
-8. **Campo turma.** Acrescente `turma VARCHAR(20)` à tabela com ALTER TABLE e adapte cadastrar/listar/alterar. Preserve registros antigos e valide até 20 caracteres.
-9. **Validação e erros.** Rejeite nome com apenas um caractere, e-mail vazio e IDs negativos. Mostre mensagens claras e mantenha o menu aberto após cada erro. Registre cinco casos de teste e seus resultados.
-10. **Mini-sistema de produtos.** Crie uma tabela `produtos` com id, nome, preco DECIMAL(10,2) e estoque INT. Implemente CRUD com PreparedStatement, BigDecimal para dinheiro, proibição de valores negativos e confirmação para excluir. Entregue também o SQL e teste produto inexistente.
+A versão curta concentra cada operação em um único `main`. Os exercícios 8, 9 e 10 têm mais linhas porque incluem menus e validações pedidos no enunciado.
 
-**Critérios de conclusão:** código compila, conexão usa configuração local, consultas recebem parâmetros, recursos são fechados e todos os casos solicitados foram demonstrados.
-
-## Referências oficiais
-
-- [JDBC e DriverManager](https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/DriverManager.html)
-- [PreparedStatement](https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/PreparedStatement.html)
-- [Connector/J: instalação](https://dev.mysql.com/doc/connector-j/en/connector-j-installing.html)
-- [Connector/J: TLS](https://dev.mysql.com/doc/connector-j/en/connector-j-reference-using-ssl.html)
-- [Downloads MySQL 8.4](https://dev.mysql.com/downloads/mysql/8.4.html)
-- [Downloads Eclipse](https://www.eclipse.org/downloads/packages/)
-
-Material didático para uso em aula. Senhas de exemplo são públicas; mantenha credenciais reais fora do Git. O PDF apresenta a conexão completa e trechos identificados do DAO; o repositório contém todas as classes completas.
+Referências: [JDBC](https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/DriverManager.html) · [PreparedStatement](https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/PreparedStatement.html) · [Connector/J](https://dev.mysql.com/doc/connector-j/en/connector-j-installing.html).

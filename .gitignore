@@ -1,7 +1,6 @@
 /target/
 /bin/
 /lib/*.jar
-/db.properties
 /.classpath
 /.project
 /.settings/
